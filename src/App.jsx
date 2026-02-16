@@ -25,6 +25,7 @@ const computed = raw.map(d => {
     gpvPerLoc: Math.round((d.gpv * 1e3 / avgLoc / 3) * 10) / 10,
     subRevPerLoc: Math.round(d.subRev * 1e3 / avgLoc / 3),
     ftGPPerLoc: Math.round(ftGP * 1e3 / avgLoc / 3),
+    netRevPerLoc: Math.round((d.subRev + ftGP) * 1e3 / avgLoc / 3),
     totalRevPerLoc: Math.round(d.totalRev * 1e3 / avgLoc / 3),
     takeRate: Math.round((d.ftRev / (d.gpv * 1e3)) * 1e5) / 1e3,
     ftMargin: Math.round((ftGP / d.ftRev) * 1e3) / 10,
@@ -42,7 +43,7 @@ const yoyGrowth = (key, currIdx) => {
   return Math.round(((curr - prior) / prior) * 1000) / 10;
 };
 
-const allKeys = ["gpvPerLoc", "subRevPerLoc", "ftGPPerLoc", "totalRevPerLoc", "totalRev", "gpv", "locEnd", "ftGP", "takeRate", "ftMargin", "subMargin", "subRev", "ftRev"];
+const allKeys = ["gpvPerLoc", "subRevPerLoc", "ftGPPerLoc", "netRevPerLoc", "totalRevPerLoc", "totalRev", "gpv", "locEnd", "ftGP", "takeRate", "ftMargin", "subMargin", "subRev", "ftRev"];
 const data = computed.map((d, i) => {
   const row = { ...d };
   allKeys.forEach(k => {
@@ -141,6 +142,7 @@ export default function Dashboard() {
           <Chart title="GPV / Location / Month" dataKey="gpvPerLoc" color={BLUE} domain={[0, 'auto']} tickFmt={v => `$${v}K`} tooltipFmt={v => `$${v.toFixed(1)}K`} />
           <Chart title="Sub Revenue / Location / Month" dataKey="subRevPerLoc" color={GREEN} domain={[0, 'auto']} tickFmt={v => `$${v}`} tooltipFmt={v => `$${v}`} />
           <Chart title="Fintech GP / Location / Month" dataKey="ftGPPerLoc" color={PURPLE} domain={[0, 'auto']} tickFmt={v => `$${v}`} tooltipFmt={v => `$${v}`} />
+          <Chart title="Net Rev / Location / Month" dataKey="netRevPerLoc" color={TEAL} domain={[0, 'auto']} tickFmt={v => `$${v}`} tooltipFmt={v => `$${v}`} />
           <Chart title="Total Rev / Location / Month" dataKey="totalRevPerLoc" color={ORANGE} domain={[0, 'auto']} tickFmt={v => `$${v}`} tooltipFmt={v => `$${v}`} />
         </div>
 
@@ -185,6 +187,7 @@ export default function Dashboard() {
                 { label: "GPV/Loc/Mo ($K)", key: "gpvPerLoc", fmt: v => `$${v.toFixed(1)}K`, color: BLUE },
                 { label: "Sub Rev/Loc/Mo", key: "subRevPerLoc", fmt: v => `$${v}`, color: GREEN },
                 { label: "FT GP/Loc/Mo", key: "ftGPPerLoc", fmt: v => `$${v}`, color: PURPLE },
+                { label: "Net Rev/Loc/Mo", key: "netRevPerLoc", fmt: v => `$${v}`, color: TEAL },
                 { label: "Total Rev/Loc/Mo", key: "totalRevPerLoc", fmt: v => `$${v}`, color: ORANGE },
                 { label: "Take Rate", key: "takeRate", fmt: v => `${v.toFixed(3)}%`, color: RED },
                 { label: "FT Margin", key: "ftMargin", fmt: v => `${v.toFixed(1)}%` },
