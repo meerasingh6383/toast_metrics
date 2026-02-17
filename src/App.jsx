@@ -46,23 +46,23 @@ const computed = raw.map(d => {
 });
 
 // YoY pairs: index -> index 4 quarters prior
-const yoyPairs: Record<number, number> = {};
+const yoyPairs = {};
 for (let i = 4; i < raw.length; i++) {
   yoyPairs[i] = i - 4;
 }
 
-const yoyGrowth = (key: string, currIdx: number) => {
+const yoyGrowth = (key, currIdx) => {
   const priorIdx = yoyPairs[currIdx];
   if (priorIdx === undefined) return null;
-  const curr = computed[currIdx][key as keyof typeof computed[0]] as number;
-  const prior = computed[priorIdx][key as keyof typeof computed[0]] as number;
+  const curr = computed[currIdx][key];
+  const prior = computed[priorIdx][key];
   if (!prior) return null;
   return Math.round(((curr - prior) / prior) * 1000) / 10;
 };
 
 const allKeys = ["gpvPerLoc", "subRevPerLoc", "ftGPPerLoc", "netRevPerLoc", "totalRevPerLoc", "totalRev", "gpv", "locEnd", "ftGP", "takeRate", "ftMargin", "subMargin", "subRev", "ftRev"];
 const data = computed.map((d, i) => {
-  const row: Record<string, any> = { ...d };
+  const row = { ...d };
   allKeys.forEach(k => {
     row[`${k}_yoy`] = yoyGrowth(k, i);
   });
@@ -80,16 +80,7 @@ const PURPLE = "#7c3aed";
 const RED = "#dc2626";
 const TEAL = "#0d9488";
 
-interface ChartProps {
-  title: string;
-  dataKey: string;
-  color: string;
-  domain: [number | string, number | string];
-  tickFmt: (v: number) => string;
-  tooltipFmt: (v: number) => string;
-}
-
-const Chart = ({ title, dataKey, color, domain, tickFmt, tooltipFmt }: ChartProps) => {
+const Chart = ({ title, dataKey, color, domain, tickFmt, tooltipFmt }) => {
   const yoyKey = `${dataKey}_yoy`;
   return (
     <div style={{ background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "16px 16px 8px" }}>
@@ -113,7 +104,7 @@ const Chart = ({ title, dataKey, color, domain, tickFmt, tooltipFmt }: ChartProp
               return (
                 <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 6, padding: "8px 12px", fontSize: 13, fontFamily: "monospace", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
                   <div style={{ color: MUTED, marginBottom: 4 }}>{label}</div>
-                  <div style={{ color }}>{tooltipFmt(payload[0].value as number)}</div>
+                  <div style={{ color }}>{tooltipFmt(payload[0].value)}</div>
                   {yoy !== null && yoy !== undefined && (
                     <div style={{ color: yoy >= 0 ? GREEN : RED, fontSize: 11, marginTop: 2 }}>
                       YoY: {yoy >= 0 ? "+" : ""}{yoy.toFixed(1)}%
@@ -184,25 +175,25 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {[
-                { label: "Locations (K)", key: "locEnd", fmt: (v: number) => `${v}K` },
-                { label: "GPV ($B)", key: "gpv", fmt: (v: number) => `$${v.toFixed(1)}B` },
-                { label: "Total Rev ($M)", key: "totalRev", fmt: (v: number) => `$${v.toLocaleString()}` },
-                { label: "Sub Rev ($M)", key: "subRev", fmt: (v: number) => `$${v}` },
-                { label: "Fintech Rev ($M)", key: "ftRev", fmt: (v: number) => `$${v.toLocaleString()}` },
-                { label: "Fintech GP ($M)", key: "ftGP", fmt: (v: number) => `$${v}` },
-                { label: "GPV/Loc/Mo ($K)", key: "gpvPerLoc", fmt: (v: number) => `$${v.toFixed(1)}K`, color: BLUE },
-                { label: "Sub Rev/Loc/Mo", key: "subRevPerLoc", fmt: (v: number) => `$${v}`, color: GREEN },
-                { label: "FT GP/Loc/Mo", key: "ftGPPerLoc", fmt: (v: number) => `$${v}`, color: PURPLE },
-                { label: "Net Rev/Loc/Mo", key: "netRevPerLoc", fmt: (v: number) => `$${v}`, color: TEAL },
-                { label: "Take Rate", key: "takeRate", fmt: (v: number) => `${v.toFixed(3)}%`, color: RED },
-                { label: "FT Margin", key: "ftMargin", fmt: (v: number) => `${v.toFixed(1)}%` },
-                { label: "Sub Margin", key: "subMargin", fmt: (v: number) => `${v.toFixed(1)}%` },
+                { label: "Locations (K)", key: "locEnd", fmt: v => `${v}K` },
+                { label: "GPV ($B)", key: "gpv", fmt: v => `$${v.toFixed(1)}B` },
+                { label: "Total Rev ($M)", key: "totalRev", fmt: v => `$${v.toLocaleString()}` },
+                { label: "Sub Rev ($M)", key: "subRev", fmt: v => `$${v}` },
+                { label: "Fintech Rev ($M)", key: "ftRev", fmt: v => `$${v.toLocaleString()}` },
+                { label: "Fintech GP ($M)", key: "ftGP", fmt: v => `$${v}` },
+                { label: "GPV/Loc/Mo ($K)", key: "gpvPerLoc", fmt: v => `$${v.toFixed(1)}K`, color: BLUE },
+                { label: "Sub Rev/Loc/Mo", key: "subRevPerLoc", fmt: v => `$${v}`, color: GREEN },
+                { label: "FT GP/Loc/Mo", key: "ftGPPerLoc", fmt: v => `$${v}`, color: PURPLE },
+                { label: "Net Rev/Loc/Mo", key: "netRevPerLoc", fmt: v => `$${v}`, color: TEAL },
+                { label: "Take Rate", key: "takeRate", fmt: v => `${v.toFixed(3)}%`, color: RED },
+                { label: "FT Margin", key: "ftMargin", fmt: v => `${v.toFixed(1)}%` },
+                { label: "Sub Margin", key: "subMargin", fmt: v => `${v.toFixed(1)}%` },
               ].map((row, ri) => (
                 <tr key={ri} style={{ borderBottom: `1px solid ${BORDER}22` }}>
                   <td style={{ padding: "6px 8px", color: row.color || MUTED, fontWeight: 500, whiteSpace: "nowrap", position: "sticky", left: 0, background: CARD_BG }}>{row.label}</td>
                   {data.map((d, di) => (
                     <td key={di} style={{ padding: "6px 6px", textAlign: "right", color: row.color || TEXT, whiteSpace: "nowrap" }}>
-                      {row.fmt(d[row.key] as number)}
+                      {row.fmt(d[row.key])}
                     </td>
                   ))}
                 </tr>
